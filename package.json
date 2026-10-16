@@ -1,0 +1,9 @@
+{
+  "name": "helpdesk-weighted-assignment",
+  "version": "1.0.0",
+  "description": "Sistema de Mesa de Ayuda con asignacion ponderada, Skills-Based y SLA con horario laboral",
+  "main": "src/index.js",
+  "scripts": {"start":"node src/index.js","dev":"nodemon src/index.js"},
+  "dependencies": {"bcryptjs":"^2.4.3","dotenv":"^16.4.5","express":"^4.19.2","pg":"^8.12.0","swagger-jsdoc":"^6.2.8","swagger-ui-express":"^5.0.1"},
+  "devDependencies": {"nodemon":"^3.1.4"}
+}

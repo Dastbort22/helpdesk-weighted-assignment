@@ -1,0 +1,1 @@
+const swaggerJsdoc=require('swagger-jsdoc'); module.exports=swaggerJsdoc({definition:{openapi:'3.0.0',info:{title:'HelpDesk Weighted Assignment API',version:'1.0.0',description:'Mesa de ayuda con Skills-Based Assignment y SLA en horario laboral'},servers:[{url:`http://localhost:${process.env.PORT||3000}`}],tags:[{name:'HelpDesk'}]},apis:['./src/routes/*.js']});
