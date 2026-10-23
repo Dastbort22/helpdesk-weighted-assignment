@@ -11,25 +11,31 @@
       <div class="hero">
         <h1>Sistema de Mesa de Ayuda</h1>
         <p>Asignación ponderada por Skills, carga y cumplimiento de SLA.</p>
-        <button onclick="cargar()">Actualizar</button>
-        <a href="/api-docs" style="color: white; margin-left: 15px">Swagger</a>
+        <div class="topbar">
+          <a class="btn" href="/tickets.html"
+            >🎫 Registrar / gestionar tickets</a
+          ><a class="btn dark" href="/users.html">👥 CRUD de usuarios</a
+          ><a class="btn dark" href="/api-docs">Swagger</a
+          ><button class="btn red" onclick="logout()">Cerrar sesión</button
+          ><span id="user" class="user"></span>
+        </div>
       </div>
       <div class="grid">
         <div class="card">
           <h3>Tickets</h3>
-          <h2 id="tickets">-</h2>
+          <div id="tickets" class="metric">-</div>
         </div>
         <div class="card">
           <h3>Agentes</h3>
-          <h2 id="agents">-</h2>
+          <div id="agents" class="metric">-</div>
         </div>
         <div class="card">
           <h3>Skills</h3>
-          <h2 id="skills">-</h2>
+          <div id="skills" class="metric">-</div>
         </div>
       </div>
-      <div class="card" style="margin-top: 20px">
-        <h2>Tickets</h2>
+      <div class="card section">
+        <h2>Tickets recientes</h2>
         <table>
           <thead>
             <tr>
@@ -40,26 +46,44 @@
               <th>Vencimiento</th>
             </tr>
           </thead>
-          <tbody id="rows"></tbody>
+          <tbody id="rows">
+            <tr>
+              <td colspan="5">Cargando...</td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </div>
     <script>
+      const u = JSON.parse(localStorage.getItem("helpdeskUser") || "null");
+      if (!u) location.href = "/login.html";
+      else user.textContent = `Sesión: ${u.name} · ${u.role}`;
+      function logout() {
+        localStorage.removeItem("helpdeskUser");
+        location.href = "/login.html";
+      }
       async function cargar() {
-        let [t, a, s] = await Promise.all([
-          fetch("/api/tickets").then((r) => r.json()),
-          fetch("/api/agents").then((r) => r.json()),
-          fetch("/api/skills").then((r) => r.json()),
-        ]);
-        tickets.textContent = t.data.length;
-        agents.textContent = a.data.length;
-        skills.textContent = s.data.length;
-        rows.innerHTML = t.data
-          .map(
-            (x) =>
-              `<tr><td>${x.id}</td><td>${x.title}</td><td>${x.priority}</td><td>${x.agent_name || "Sin asignar"}</td><td>${x.due_at ? new Date(x.due_at).toLocaleString() : "-"}</td></tr>`,
-          )
-          .join("");
+        try {
+          const [t, a, s] = await Promise.all([
+            fetch("/api/tickets").then((r) => r.json()),
+            fetch("/api/agents").then((r) => r.json()),
+            fetch("/api/skills").then((r) => r.json()),
+          ]);
+          tickets.textContent = t.data.length;
+          agents.textContent = a.data.length;
+          skills.textContent = s.data.length;
+          rows.innerHTML =
+            t.data
+              .slice(0, 10)
+              .map(
+                (x) =>
+                  `<tr><td>${x.id}</td><td>${x.title}</td><td><span class="pill">${x.priority}</span></td><td>${x.agent_name || "Sin asignar"}</td><td>${x.due_at ? new Date(x.due_at).toLocaleString("es-CO") : "-"}</td></tr>`,
+              )
+              .join("") ||
+            '<tr><td colspan="5">No hay tickets registrados.</td></tr>';
+        } catch (e) {
+          rows.innerHTML = `<tr><td colspan="5">${e.message}</td></tr>`;
+        }
       }
       cargar();
     </script>
